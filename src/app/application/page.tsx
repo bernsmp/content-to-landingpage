@@ -114,8 +114,8 @@ Prerequisites: Basic JavaScript and React knowledge recommended. No prior experi
       toast.success("Analysis Complete", {
         description: "Educational content analyzed successfully with AI!",
       });
-    } catch (err: unknown) {
-      const errorMessage = err instanceof Error ? err.message : "Unknown error occurred";
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       setError(errorMessage);
 
       toast.error("Analysis Failed", {
