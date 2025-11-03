@@ -10,12 +10,13 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { BookOpen, Sparkles, Target, Lightbulb, Copy, Check } from "lucide-react";
+import { BookOpen, Sparkles, Target, Lightbulb, Copy, Check, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ApplicationPage() {
   const [content, setContent] = useState("");
   const [vibe, setVibe] = useState("");
+  const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [analysis, setAnalysis] = useState<{
     contentType: string;
     keyTopics: string[];
@@ -87,6 +88,80 @@ Prerequisites: Basic JavaScript and React knowledge recommended. No prior experi
 
   const handleSampleContent = (type: string) => {
     setContent(sampleContents[type as keyof typeof sampleContents]);
+    setUploadedFile(null);
+  };
+
+  const handleFileUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file size (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("File too large", {
+        description: "Please upload a file smaller than 5MB",
+      });
+      return;
+    }
+
+    // Check file type
+    const allowedTypes = [
+      'text/plain',
+      'text/markdown',
+      'application/pdf',
+      'application/msword',
+      'application/vnd.openxmlformats-officedocument.wordprocessingml.document'
+    ];
+
+    if (!allowedTypes.includes(file.type) && !file.name.match(/\.(txt|md|pdf|doc|docx)$/i)) {
+      toast.error("Unsupported file type", {
+        description: "Please upload .txt, .md, .pdf, .doc, or .docx files",
+      });
+      return;
+    }
+
+    setUploadedFile(file);
+
+    // Read file content
+    try {
+      const text = await readFileContent(file);
+      setContent(text);
+      toast.success("File uploaded", {
+        description: `${file.name} has been loaded successfully`,
+      });
+    } catch (error) {
+      toast.error("Failed to read file", {
+        description: error instanceof Error ? error.message : "Unknown error occurred",
+      });
+      setUploadedFile(null);
+    }
+  };
+
+  const readFileContent = async (file: File): Promise<string> => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+
+      reader.onload = (e) => {
+        const text = e.target?.result as string;
+        resolve(text);
+      };
+
+      reader.onerror = () => {
+        reject(new Error("Failed to read file"));
+      };
+
+      // For now, only handle text files
+      // PDF and DOCX would require additional libraries
+      if (file.type === 'text/plain' || file.type === 'text/markdown' || file.name.match(/\.(txt|md)$/i)) {
+        reader.readAsText(file);
+      } else {
+        reject(new Error("PDF and DOCX support coming soon. Please use .txt or .md files for now."));
+      }
+    });
+  };
+
+  const removeFile = () => {
+    setUploadedFile(null);
+    setContent("");
   };
 
   const handleAnalyze = async () => {
@@ -235,6 +310,52 @@ After completing all tasks from this prompt, provide a 1-line feedback summary t
                     Workshop Guide
                   </Button>
                 </div>
+              </div>
+
+              {/* File Upload */}
+              <div>
+                <Label className="text-base font-medium mb-3 block">Or upload a file:</Label>
+                {!uploadedFile ? (
+                  <div className="relative">
+                    <input
+                      type="file"
+                      id="file-upload"
+                      className="sr-only"
+                      accept=".txt,.md,.pdf,.doc,.docx"
+                      onChange={handleFileUpload}
+                    />
+                    <label
+                      htmlFor="file-upload"
+                      className="flex items-center justify-center gap-2 h-12 px-4 border-2 border-dashed border-[#d4cdb8] rounded-lg cursor-pointer hover:border-[#b8b1a1] hover:bg-gray-50 transition-colors"
+                    >
+                      <Upload className="w-5 h-5 text-gray-500" />
+                      <span className="text-base text-gray-600">
+                        Choose file (.txt, .md, .pdf, .doc, .docx)
+                      </span>
+                    </label>
+                  </div>
+                ) : (
+                  <div className="flex items-center justify-between p-4 border-2 border-[#d4cdb8] rounded-lg bg-gray-50">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+                        <BookOpen className="w-5 h-5 text-primary" />
+                      </div>
+                      <div>
+                        <p className="text-base font-medium">{uploadedFile.name}</p>
+                        <p className="text-sm text-gray-500">
+                          {(uploadedFile.size / 1024).toFixed(1)} KB
+                        </p>
+                      </div>
+                    </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={removeFile}
+                    >
+                      <X className="w-4 h-4" />
+                    </Button>
+                  </div>
+                )}
               </div>
 
               {/* Content Input */}
