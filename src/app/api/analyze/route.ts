@@ -56,7 +56,7 @@ Design Style: ${vibe}`;
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-3-5-sonnet-20241022",
+        model: "claude-3-sonnet-20240229",
         max_tokens: 2000,
         messages: [
           {
@@ -71,11 +71,12 @@ Design Style: ${vibe}`;
       const errorData = await response.json();
       console.error("Claude API error:", errorData);
 
-      // If it's a credit/billing error, return mock data instead
-      if (response.status === 429 || response.status === 402 ||
+      // If it's a credit/billing/access error, return mock data instead
+      if (response.status === 429 || response.status === 402 || response.status === 404 ||
+          errorData.error?.type === "not_found_error" ||
           (errorData.error?.type === "invalid_request_error" &&
            errorData.error?.message?.includes("credit"))) {
-        console.log("Insufficient credits - falling back to mock data");
+        console.log("API access issue - falling back to mock data");
         return NextResponse.json({
           contentType: content.length > 500 ? "Long-form educational content" : "Short-form educational content",
           keyTopics: ["Educational Technology", "Interactive Learning", "Content Design"],
