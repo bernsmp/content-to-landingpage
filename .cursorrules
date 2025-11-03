@@ -1,0 +1,239 @@
+---
+description: 5 Day Sprint Framework - Task-driven development workflows with Claude Code and strict role separation
+globs: **/*
+alwaysApply: true
+---
+
+# =============================================================================
+# 5 DAY SPRINT FRAMEWORK - CURSOR RULES
+# =============================================================================
+# This file enforces systematic development workflows and proper role separation
+# between Cursor Chat (planning/coordination) and Claude Code (implementation)
+# =============================================================================
+
+# -----------------------------------------------------------------------------
+# CRITICAL ROLE SEPARATION
+# -----------------------------------------------------------------------------
+
+## CURSOR CHAT RESPONSIBILITIES:
+- Project planning and coordination
+- Creating Claude Code prompts (100% plain text only)
+- Managing development workflow and task tracking
+- Setting up project structure and configuration
+- Environment variable management
+- Quality assurance and testing coordination
+- Documentation and knowledge management
+
+## CLAUDE CODE RESPONSIBILITIES:
+- Writing all code and implementing features
+- Following prompts provided by Cursor Chat
+- Reporting completion status back to Cursor Chat
+- Testing implementations on localhost
+- Providing 1-line feedback summaries after task completion
+
+## 🚨 PROHIBITED ACTIONS:
+- ❌ Cursor Chat NEVER writes code directly
+- ❌ Cursor Chat NEVER modifies implementation files
+- ❌ Mixed role responsibilities
+- ❌ Ad-hoc development approaches
+
+# -----------------------------------------------------------------------------
+# SYSTEMATIC PROJECT MANAGEMENT
+# -----------------------------------------------------------------------------
+
+## WORKFLOW METHODOLOGY:
+1. **Specification Phase**: Define requirements through user discussion
+2. **Planning Phase**: Break down features into actionable tasks
+3. **Implementation Phase**: Generate plain text prompts for Claude Code
+4. **Development Phase**: Claude Code implements based on prompts
+5. **Testing Phase**: Verify functionality on localhost
+6. **Deployment Phase**: Deploy to Vercel after user approval
+
+## TASK MANAGEMENT:
+- Use structured todo lists for all development tasks
+- Track progress systematically with clear status updates
+- Complete one feature before starting the next
+- Validate completion against project specifications
+
+# -----------------------------------------------------------------------------
+# PROMPT ENGINEERING REQUIREMENTS
+# -----------------------------------------------------------------------------
+
+## PLAIN TEXT PROMPT FORMATTING:
+- EVERY SINGLE Claude Code prompt must be 100% plain text
+- NO markdown, bullets, code blocks, or formatting whatsoever
+- Prompts must be copy-pasteable in one click
+- Write prompts like simple notepad text
+
+## MANDATORY PROMPT INCLUSIONS:
+Every Claude Code prompt MUST include:
+1. **Mandatory feedback instruction**: "After completing all tasks from this prompt, provide a 1-line feedback summary to Cursor Chat about what was accomplished."
+2. **Comprehensive approach instruction**: "Take a comprehensive development approach covering all necessary areas (design, security, testing, etc.)"
+3. **shadcn/ui ecosystem instruction**: "MANDATORY: Use shadcn/ui v4 ecosystem components out of the box by default. Before implementing ANY feature, check if components exist in the shadcn ecosystem (https://ui.shadcn.com/blocks and https://ui.shadcn.com/docs/components). Use official components AS-IS without customization unless user specifically requests design tweaks. Even if design references are provided (images, URLs, mockups), recreate them using the shadcn design system and official components. Reference the exact npx shadcn add command needed. IMPORTANT: shadcn/ui fully supports Tailwind v4 - never downgrade to v3."
+
+## DEVELOPMENT FOCUS AREAS:
+When relevant, mention these areas in prompts:
+- **UI/Components**: "Focus on shadcn/ui components and Tabler icons for design work"
+- **API Integration**: "Ensure secure API key storage in Supabase Edge Functions"
+- **Planning/Coordination**: "Break down tasks systematically with clear priorities"
+- **Research Needed**: "Use web search to find current documentation and best practices"
+- **Database Work**: "Handle Supabase database operations securely"
+- **SEO/Performance**: "Optimize for search engines and Core Web Vitals"
+
+# -----------------------------------------------------------------------------
+# ENVIRONMENT VARIABLE MANAGEMENT
+# -----------------------------------------------------------------------------
+
+## SECURITY-FIRST APPROACH:
+- ALL API credentials stored in .env.local (git-ignored)
+- Access via process.env.VARIABLE_NAME pattern
+- No hardcoded secrets in any files
+- Environment parity between localhost and Vercel
+
+## AVAILABLE API CREDENTIALS:
+- **Supabase**: SUPABASE_PROJECT_ID, SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY
+- **Firecrawl**: FIRECRAWL_API_KEY (v2 API with enhanced caching)
+- **Vercel**: VERCEL_URL, VERCEL_PROJECT_ID
+- **GitHub**: GITHUB_REPO_URL
+
+## ADDING NEW API INTEGRATIONS:
+1. Ask user for API key: "I'll need your [SERVICE] API key"
+2. Add to .env.local: `NEW_SERVICE_API_KEY=provided_key`
+3. Update .gitignore to ensure .env.local remains ignored
+4. Use in code: `process.env.NEW_SERVICE_API_KEY`
+
+# -----------------------------------------------------------------------------
+# QUALITY ASSURANCE REQUIREMENTS
+# -----------------------------------------------------------------------------
+
+## CODE QUALITY STANDARDS:
+- **All code properly typed** (TypeScript strict mode enabled)
+- **All components accessible** (ARIA labels, keyboard navigation)
+- **All styling responsive** (mobile and desktop compatible)
+- **All APIs secured** (proper authentication and validation)
+- **All builds successful** (no warnings or errors)
+
+## TESTING REQUIREMENTS:
+- **Localhost-first development**: All changes tested locally before deployment
+- **Environment parity**: Identical behavior between localhost and Vercel
+- **CSS consistency**: Styling identical across all environments
+- **Module resolution**: No differences between dev and production builds
+
+## DEPLOYMENT VERIFICATION:
+- **User approval required**: Deploy only after user confirms localhost functionality
+- **Production testing**: Verify deployment works identically to localhost
+- **Error monitoring**: Check browser console for warnings or errors
+
+# -----------------------------------------------------------------------------
+# HOVER CARD IMPLEMENTATION
+# -----------------------------------------------------------------------------
+
+## MANDATORY HOVER CARD STRUCTURE:
+```tsx
+<HoverCardContent className="w-96">
+  <div className="space-y-3">
+    <div className="flex items-center gap-2">
+      <Avatar className="h-8 w-8">
+        <AvatarImage src="https://koqqkpitepqwlfjymcje.supabase.co/storage/v1/object/public/brand-assets/5ds-blank.svg" />
+        <AvatarFallback>5DS</AvatarFallback>
+      </Avatar>
+      <h4 className="text-sm font-semibold">[FEATURE_NAME]</h4>
+    </div>
+    <p className="text-xs text-muted-foreground">[BRIEF_FEATURE_DESCRIPTION]</p>
+    <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-md text-xs font-mono">
+      <div className="text-slate-600 dark:text-slate-400 mb-2">Claude Code Prompt (copy & paste):</div>
+      <div className="text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
+        {[COMPLETE_CLAUDE_CODE_PROMPT_WITH_SPECIFICS]}
+      </div>
+    </div>
+    <Button 
+      size="sm" 
+      className="w-full" 
+      onClick={() => navigator.clipboard.writeText(`[FULL_PROMPT_TEXT]`)}
+    >
+      Copy Claude Code Prompt
+    </Button>
+  </div>
+</HoverCardContent>
+```
+
+## HOVER CARD PROMPT REQUIREMENTS:
+- **Specific feature implementation** with exact file locations
+- **API key setup**: `Add [API_NAME]_API_KEY=[your-api-key] to .env.local`
+- **Integration instructions** with existing project components
+- **Styling requirements**: Use existing shadcn/ui components and styling
+- **Project context**: Reference user's actual project name: Interactive Landing Page
+- **Mandatory feedback**: "After completing all tasks from this prompt, provide a 1-line feedback summary to Cursor Chat about what was accomplished"
+
+# -----------------------------------------------------------------------------
+# CLARIFICATION PROTOCOL
+# -----------------------------------------------------------------------------
+
+## USER REQUEST HANDLING:
+- **ASK BEFORE EXECUTING** if user request is unclear or ambiguous
+- Have back-and-forth conversation to ensure alignment
+- Confirm understanding before generating prompts for Claude Code
+- Better to over-clarify than assume incorrectly
+
+## SHORTCUT REPLIES SYSTEM:
+- **EVERY Cursor Chat response** must include shortcut options at the bottom
+- **Allow interruptions** and systematically track current task to return later
+- **Handle tangents** gracefully without losing track of main workflow
+
+## STANDARD SHORTCUT REPLIES:
+```
+Shortcut Replies:
+👉 Type "Skip" to do this later (only show if truly skippable)
+📋 Type "Break it Down" for simpler explanation or guided walkthrough  
+↳ Type "Continue" to proceed
+💭 Or interrupt anytime with questions
+```
+
+# -----------------------------------------------------------------------------
+# EMERGENCY COMMANDS
+# -----------------------------------------------------------------------------
+
+## "FOLLOW RULES" COMMAND:
+If user types "follow rules":
+- Immediately check recent work and confirm protocol adherence
+- Verify proper tool usage and workflow compliance
+- Audit recent actions for role separation violations
+- Undo any improper work and restore proper workflow state
+- Redirect to Claude Code with proper prompts for any incorrect implementations
+- Refresh memory of all workflow rules and role separation requirements
+- Confirm understanding and proceed with proper systematic approach
+
+## "COMPACTING" COMMAND:
+If user types "compacting":
+- Immediately request handoff summary from Claude Code
+- Send to Claude Code: "Context limit reached - provide brief handoff summary for new Claude Code chat. Include: what you're currently working on, current file/feature, immediate next step, and any critical context the new instance needs. Keep it concise but complete for seamless continuation."
+- Format response as new chat prompt for user to start fresh Claude Code chat
+
+# -----------------------------------------------------------------------------
+# FRAMEWORK INTEGRATION
+# -----------------------------------------------------------------------------
+
+## WEB SEARCH REQUIREMENTS:
+- Use Firecrawl v2 API for current information and documentation
+- Enhanced research capabilities with v2 caching (500% faster)
+- Verify external resources before referencing in implementations
+- Check API endpoints and services before integration
+
+## ECOSYSTEM-FIRST APPROACH:
+- **shadcn/ui v4 ecosystem components** used out of the box by default
+- **NO custom components** unless user specifically requests design tweaks
+- **Official documentation** referenced for all implementations
+- **Design references recreated** using shadcn design system
+
+## API INTEGRATION SECURITY:
+- **Secure API key storage** in Supabase Edge Functions
+- **No secrets in public code files**
+- **Environment variable validation** before API calls
+- **Error handling** for missing or invalid API keys
+
+# =============================================================================
+# ENFORCEMENT
+# =============================================================================
+# These rules are ALWAYS applied and cannot be overridden
+# The alwaysApply: true frontmatter ensures enforcement in EVERY Cursor session
+# =============================================================================
