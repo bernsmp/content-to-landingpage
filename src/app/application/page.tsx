@@ -9,13 +9,25 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { ArrowRight, BookOpen, Sparkles, Target, Lightbulb, Copy, Check } from "lucide-react";
+import { BookOpen, Sparkles, Target, Lightbulb, Copy, Check } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ApplicationPage() {
   const [content, setContent] = useState("");
   const [vibe, setVibe] = useState("");
-  const [analysis, setAnalysis] = useState<any>(null);
+  const [analysis, setAnalysis] = useState<{
+    contentType: string;
+    keyTopics: string[];
+    learningObjectives: string[];
+    suggestedInteractions: string[];
+    targetAudience?: string;
+    difficulty?: string;
+    estimatedDuration?: string;
+    vibe: string;
+    valueProposition: string;
+    _mockData?: boolean;
+    _message?: string;
+  } | null>(null);
   const [copiedStates, setCopiedStates] = useState<{[key: string]: boolean}>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -167,7 +179,7 @@ After completing all tasks from this prompt, provide a 1-line feedback summary t
             <Badge variant="outline" className="text-sm px-3 py-1">AI Builder</Badge>
           </div>
           <Button variant="outline" size="lg" asChild>
-            <a href="/">← Back to Home</a>
+            <Link href="/">← Back to Home</Link>
           </Button>
         </div>
       </header>
@@ -314,7 +326,7 @@ After completing all tasks from this prompt, provide a 1-line feedback summary t
                   <CardHeader className="pb-6 pt-8 px-8">
                     <CardTitle className="flex items-center gap-3 text-2xl font-semibold">
                       <Lightbulb className="w-6 h-6" />
-                      Here's What We Found
+                      Here&apos;s What We Found
                     </CardTitle>
                     <CardDescription className="text-base leading-relaxed mt-2">
                       Your content analysis is complete. Review the insights below.
@@ -422,7 +434,7 @@ After completing all tasks from this prompt, provide a 1-line feedback summary t
                     </CardTitle>
                     <CardDescription className="text-base leading-relaxed mt-2">
                       Copy this entire prompt and paste it into Claude Code.
-                      It'll build your interactive features automatically.
+                      It&apos;ll build your interactive features automatically.
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="px-8 pb-8">
@@ -512,7 +524,7 @@ After completing all tasks from this prompt, provide a 1-line feedback summary t
                   <h3 className="text-2xl font-semibold mb-3">Your Results Will Appear Here</h3>
                   <p className="text-base text-muted-foreground leading-relaxed max-w-md mx-auto">
                     Fill in the form on the left to get started.
-                    You'll see insights, recommendations, and a ready-to-use implementation prompt.
+                    You&apos;ll see insights, recommendations, and a ready-to-use implementation prompt.
                   </p>
                 </CardContent>
               </Card>

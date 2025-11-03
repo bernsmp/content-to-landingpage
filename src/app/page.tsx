@@ -1,8 +1,5 @@
-import Link from "next/link";
-import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { ArrowRight, Sparkles, Zap, Shield } from "lucide-react";
+import { Sparkles, Zap, Shield } from "lucide-react";
 import { Hero } from "@/components/ui/hero";
 
 export default function Home() {
@@ -42,7 +39,7 @@ export default function Home() {
               <CardTitle className="text-3xl font-bold mb-5 leading-tight">Stop Wasting Hours on Content Design</CardTitle>
               <CardDescription className="text-lg leading-relaxed text-gray-700">
                 Paste your lecture notes, course outline, or research paper.
-                Our AI instantly identifies what makes your content engaging—and what's missing.
+                Our AI instantly identifies what makes your content engaging—and what&apos;s missing.
               </CardDescription>
             </CardHeader>
             <CardContent className="px-10 pb-10">
@@ -100,7 +97,7 @@ export default function Home() {
               <CardTitle className="text-3xl font-bold mb-5 leading-tight">From Boring to Brilliant in 5 Minutes</CardTitle>
               <CardDescription className="text-lg leading-relaxed text-gray-700">
                 Your students are losing interest. You need results fast.
-                Start with working code that's ready to deploy—not a tutorial to follow.
+                Start with working code that&apos;s ready to deploy—not a tutorial to follow.
               </CardDescription>
             </CardHeader>
             <CardContent className="px-10 pb-10">
