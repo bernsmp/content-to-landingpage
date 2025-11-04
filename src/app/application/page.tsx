@@ -172,6 +172,9 @@ Prerequisites: Basic JavaScript and React knowledge recommended. No prior experi
     // Scroll to top of page smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    // Add minimum loading time to ensure user sees the loading state
+    const minimumLoadingTime = new Promise(resolve => setTimeout(resolve, 800));
+
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -187,12 +190,19 @@ Prerequisites: Basic JavaScript and React knowledge recommended. No prior experi
       }
 
       const analysisData = await response.json();
+
+      // Wait for minimum loading time to complete
+      await minimumLoadingTime;
+
       setAnalysis(analysisData);
 
       toast.success("Analysis Complete", {
         description: "Educational content analyzed successfully with AI!",
       });
     } catch (error: unknown) {
+      // Wait for minimum loading time even on error
+      await minimumLoadingTime;
+
       const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
       setError(errorMessage);
 
