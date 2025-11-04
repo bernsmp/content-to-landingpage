@@ -10,6 +10,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Dialog, DialogContent } from "@/components/ui/dialog";
 import { BookOpen, Sparkles, Target, Lightbulb, Copy, Check, Upload, X } from "lucide-react";
 import { toast } from "sonner";
 
@@ -165,18 +166,15 @@ Prerequisites: Basic JavaScript and React knowledge recommended. No prior experi
   };
 
   const handleAnalyze = async () => {
-    setIsLoading(true);
     setError(null);
     setAnalysis(null);
+    setIsLoading(true);
 
-    // Scroll to top of page smoothly
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-
-    // Give React time to render the loading state before starting the API call
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Give React time to render the loading popup
+    await new Promise(resolve => setTimeout(resolve, 50));
 
     // Add minimum loading time to ensure user sees the loading state
-    const minimumLoadingTime = new Promise(resolve => setTimeout(resolve, 800));
+    const minimumLoadingTime = new Promise(resolve => setTimeout(resolve, 1200));
 
     try {
       const response = await fetch("/api/analyze", {
@@ -427,19 +425,6 @@ IMPORTANT: Before you begin building, please confirm:
 
           {/* Analysis Results */}
           <div className="space-y-8">
-            {/* Loading State */}
-            {isLoading && (
-              <Card className="border-2 border-[#d4cdb8] shadow-[0_12px_40px_rgb(0,0,0,0.12)] bg-white rounded-2xl">
-                <CardContent className="p-16 text-center">
-                  <Sparkles className="w-16 h-16 text-primary animate-pulse mx-auto mb-6" />
-                  <h3 className="text-2xl font-semibold mb-3">Working on it...</h3>
-                  <p className="text-base text-muted-foreground leading-relaxed">
-                    Our AI is reading your content, extracting key insights, and building your interactive blueprint.
-                  </p>
-                </CardContent>
-              </Card>
-            )}
-
             {/* Error State */}
             {error && (
               <Card className="border-2 border-destructive shadow-[0_12px_40px_rgb(220,38,38,0.15)] bg-white rounded-2xl">
@@ -623,6 +608,24 @@ IMPORTANT: Before you begin building, please confirm:
           </div>
         </div>
       </main>
+
+      {/* Loading Dialog Popup */}
+      <Dialog open={isLoading}>
+        <DialogContent showCloseButton={false} className="max-w-md">
+          <div className="text-center py-8">
+            <Sparkles className="w-20 h-20 text-primary animate-pulse mx-auto mb-6" />
+            <h3 className="text-3xl font-semibold mb-4">Analyzing Your Content...</h3>
+            <p className="text-lg text-muted-foreground leading-relaxed">
+              Our AI is reading your content, extracting key insights, and building your interactive blueprint.
+            </p>
+            <div className="mt-8 flex items-center justify-center gap-2">
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }}></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }}></div>
+              <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }}></div>
+            </div>
+          </div>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
