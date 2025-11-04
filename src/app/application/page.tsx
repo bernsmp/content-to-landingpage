@@ -172,6 +172,9 @@ Prerequisites: Basic JavaScript and React knowledge recommended. No prior experi
     // Scroll to top of page smoothly
     window.scrollTo({ top: 0, behavior: 'smooth' });
 
+    // Give React time to render the loading state before starting the API call
+    await new Promise(resolve => setTimeout(resolve, 100));
+
     // Add minimum loading time to ensure user sees the loading state
     const minimumLoadingTime = new Promise(resolve => setTimeout(resolve, 800));
 
