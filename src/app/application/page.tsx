@@ -169,6 +169,9 @@ Prerequisites: Basic JavaScript and React knowledge recommended. No prior experi
     setError(null);
     setAnalysis(null);
 
+    // Scroll to top of page smoothly
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
     try {
       const response = await fetch("/api/analyze", {
         method: "POST",
@@ -241,7 +244,10 @@ Technical Specifications:
 - No external API dependencies for MVP (can be added later)
 - Deploy to Vercel with environment parity
 
-After completing all tasks from this prompt, provide a 1-line feedback summary to Cursor Chat about what was accomplished.`;
+IMPORTANT: Before you begin building, please confirm:
+1. What you understand from this request
+2. What interactive landing page you will create
+3. Ask if there are any changes or adjustments needed before starting`;
   };
 
   return (
@@ -555,8 +561,10 @@ After completing all tasks from this prompt, provide a 1-line feedback summary t
                       Your Ready-to-Use Prompt
                     </CardTitle>
                     <CardDescription className="text-base leading-relaxed mt-2">
-                      Copy this entire prompt and paste it into Claude Code.
-                      It&apos;ll build your interactive features automatically.
+                      Copy this prompt and paste it into <a href="https://claude.ai" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Claude</a>.
+                      Claude will generate an interactive artifact landing page that you can share via link,
+                      self-host on platforms like <a href="https://netlify.com" target="_blank" rel="noopener noreferrer" className="text-primary hover:underline">Netlify</a>,
+                      or customize further by giving Claude natural instructions like &quot;make the header dark blue&quot; or &quot;remove the signup form.&quot;
                     </CardDescription>
                   </CardHeader>
                   <CardContent className="px-8 pb-8">
@@ -578,62 +586,10 @@ After completing all tasks from this prompt, provide a 1-line feedback summary t
                       ) : (
                         <>
                           <Copy className="w-5 h-5 mr-2" />
-                          Copy Claude Code Prompt
+                          Copy Claude Prompt
                         </>
                       )}
                     </Button>
-                  </CardContent>
-                </Card>
-
-                {/* AI Integration Hover Card */}
-                <Card className="border-primary/20">
-                  <CardContent className="p-6">
-                    <HoverCard>
-                      <HoverCardTrigger asChild>
-                        <div className="cursor-pointer">
-                          <div className="flex items-center gap-3 mb-3">
-                            <Avatar className="w-10 h-10">
-                              <AvatarImage src="https://koqqkpitepqwlfjymcje.supabase.co/storage/v1/object/public/brand-assets/5ds-blank.svg" />
-                              <AvatarFallback className="bg-primary text-primary-foreground">5DS</AvatarFallback>
-                            </Avatar>
-                            <div>
-                              <h4 className="font-semibold text-sm">AI Integration Available</h4>
-                              <p className="text-xs text-muted-foreground">Add Claude API for enhanced analysis</p>
-                            </div>
-                          </div>
-                          <Button variant="outline" size="sm" className="w-full">
-                            Upgrade to AI-Powered Analysis
-                          </Button>
-                        </div>
-                      </HoverCardTrigger>
-                      <HoverCardContent className="w-96">
-                        <div className="space-y-3">
-                          <div className="flex items-center gap-2">
-                            <Avatar className="h-8 w-8">
-                              <AvatarImage src="https://koqqkpitepqwlfjymcje.supabase.co/storage/v1/object/public/brand-assets/5ds-blank.svg" />
-                              <AvatarFallback>5DS</AvatarFallback>
-                            </Avatar>
-                            <h4 className="text-sm font-semibold">AI-Powered Content Analysis</h4>
-                          </div>
-                          <p className="text-xs text-muted-foreground">
-                            Connect Claude API for advanced content analysis, personalized learning path recommendations, and intelligent prompt generation.
-                          </p>
-                          <div className="bg-slate-50 dark:bg-slate-900 p-3 rounded-md text-xs font-mono">
-                            <div className="text-slate-600 dark:text-slate-400 mb-2">Claude Code Prompt (copy & paste):</div>
-                            <div className="text-slate-800 dark:text-slate-200 whitespace-pre-wrap">
-                              {`Add AI-powered content analysis to Content to Landing Page. Create API route at /api/analyze using Claude API. Add ANTHROPIC_API_KEY=your-api-key to .env.local. Implement real content analysis with personalized learning recommendations and enhanced prompt generation. Use existing shadcn/ui components and styling. After completing all tasks from this prompt, provide a 1-line feedback summary to Cursor Chat about what was accomplished.`}
-                            </div>
-                          </div>
-                          <Button
-                            size="sm"
-                            className="w-full"
-                            onClick={() => copyToClipboard(`Add AI-powered content analysis to Content to Landing Page. Create API route at /api/analyze using Claude API. Add ANTHROPIC_API_KEY=your-api-key to .env.local. Implement real content analysis with personalized learning recommendations and enhanced prompt generation. Use existing shadcn/ui components and styling. After completing all tasks from this prompt, provide a 1-line feedback summary to Cursor Chat about what was accomplished.`, "ai-integration")}
-                          >
-                            Copy Claude Code Prompt
-                          </Button>
-                        </div>
-                      </HoverCardContent>
-                    </HoverCard>
                   </CardContent>
                 </Card>
               </>
