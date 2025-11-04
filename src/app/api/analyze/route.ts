@@ -56,7 +56,7 @@ Design Style: ${vibe}`;
         "anthropic-version": "2023-06-01",
       },
       body: JSON.stringify({
-        model: "claude-4-5-haiku-latest",
+        model: "claude-3-5-haiku-20241022",
         max_tokens: 2000,
         messages: [
           {
