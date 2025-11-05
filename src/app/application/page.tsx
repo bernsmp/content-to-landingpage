@@ -11,7 +11,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Dialog, DialogContent } from "@/components/ui/dialog";
-import { BookOpen, Sparkles, Target, Lightbulb, Copy, Check, Upload, X } from "lucide-react";
+import { BookOpen, Sparkles, Target, Lightbulb, Copy, Check, Upload, X, Edit2, Plus, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ApplicationPage() {
@@ -34,6 +34,13 @@ export default function ApplicationPage() {
   const [copiedStates, setCopiedStates] = useState<{[key: string]: boolean}>({});
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isEditing, setIsEditing] = useState(false);
+  const [showPrompt, setShowPrompt] = useState(false);
+
+  // Editable analysis fields
+  const [editableTopics, setEditableTopics] = useState<string[]>([]);
+  const [editableObjectives, setEditableObjectives] = useState<string[]>([]);
+  const [editableInteractions, setEditableInteractions] = useState<string[]>([]);
 
   // Sample educational content for demo
   const sampleContents = {
@@ -168,6 +175,7 @@ Prerequisites: Basic JavaScript and React knowledge recommended. No prior experi
   const handleAnalyze = async () => {
     setError(null);
     setAnalysis(null);
+    setShowPrompt(false);
     setIsLoading(true);
 
     // Give React time to render the loading popup
@@ -197,8 +205,13 @@ Prerequisites: Basic JavaScript and React knowledge recommended. No prior experi
 
       setAnalysis(analysisData);
 
+      // Initialize editable fields with analysis data
+      setEditableTopics(analysisData.keyTopics || []);
+      setEditableObjectives(analysisData.learningObjectives || []);
+      setEditableInteractions(analysisData.suggestedInteractions || []);
+
       toast.success("Analysis Complete", {
-        description: "Educational content analyzed successfully with AI!",
+        description: "Review and edit the suggestions, then confirm to get your prompt!",
       });
     } catch (error: unknown) {
       // Wait for minimum loading time even on error
@@ -213,6 +226,39 @@ Prerequisites: Basic JavaScript and React knowledge recommended. No prior experi
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleConfirmAnalysis = () => {
+    setShowPrompt(true);
+    toast.success("Prompt Ready!", {
+      description: "Your customized Claude prompt is ready to copy",
+    });
+  };
+
+  const addArrayItem = (
+    array: string[],
+    setter: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    setter([...array, ""]);
+  };
+
+  const updateArrayItem = (
+    index: number,
+    value: string,
+    array: string[],
+    setter: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    const updated = [...array];
+    updated[index] = value;
+    setter(updated);
+  };
+
+  const removeArrayItem = (
+    index: number,
+    array: string[],
+    setter: React.Dispatch<React.SetStateAction<string[]>>
+  ) => {
+    setter(array.filter((_, i) => i !== index));
   };
 
   const copyToClipboard = async (text: string, key: string) => {
@@ -235,30 +281,40 @@ Prerequisites: Basic JavaScript and React knowledge recommended. No prior experi
   const generateClaudePrompt = () => {
     if (!analysis) return "";
 
-    return `Create an interactive learning experience for: "${content.substring(0, 100)}..."
+    return `Create an interactive, single-page learning experience as an HTML artifact that users can immediately interact with.
 
-Key Requirements:
-1. Implement ${analysis.vibe} design aesthetic using shadcn/ui components
-2. Include these core features:
-   - Content input and analysis interface
-   - Interactive elements: ${analysis.suggestedInteractions.join(", ")}
-   - Progress tracking and assessment tools
-   - Responsive design for mobile and desktop
+Content Overview:
+"${content.substring(0, 150)}..."
 
-3. Use Next.js 15 with TypeScript and integrate with existing Content to Landing Page application structure
-4. Follow the established design system and component patterns
-5. Ensure all components are accessible and performant
+Design Requirements:
+1. **Visual Style**: ${analysis.vibe} aesthetic
+   - Use modern, clean design with smooth animations
+   - Responsive layout that works on all devices
+   - Professional color scheme that matches the ${analysis.vibe} vibe
+
+2. **Interactive Features** (must include all):
+${editableInteractions.map((interaction, i) => `   ${i + 1}. ${interaction}`).join('\n')}
+
+3. **Learning Objectives** to address:
+${editableObjectives.map((obj, i) => `   ${i + 1}. ${obj}`).join('\n')}
+
+4. **Key Topics** to cover:
+${editableTopics.map((topic, i) => `   ${i + 1}. ${topic}`).join('\n')}
 
 Technical Specifications:
-- State management: React Context with localStorage persistence
-- Styling: Tailwind CSS with shadcn/ui design system
-- No external API dependencies for MVP (can be added later)
-- Deploy to Vercel with environment parity
+- Single HTML file with embedded CSS and JavaScript
+- Use modern ES6+ JavaScript (no frameworks needed for artifact)
+- Include smooth transitions and micro-interactions
+- Ensure full accessibility (ARIA labels, keyboard navigation)
+- Mobile-first responsive design
 
-IMPORTANT: Before you begin building, please confirm:
-1. What you understand from this request
-2. What interactive landing page you will create
-3. Ask if there are any changes or adjustments needed before starting`;
+Implementation Guidelines:
+- Start building immediately - create a functional, beautiful artifact
+- If you need any additional context about the content domain or specific interaction patterns, mention what would be helpful but proceed with sensible defaults
+- Focus on creating an engaging, intuitive user experience
+- Include visual feedback for all interactions
+
+Note: The content is for ${analysis.targetAudience || 'general learners'} at ${analysis.difficulty || 'intermediate'} level, estimated ${analysis.estimatedDuration || '30-60 minutes'} to complete.`;
   };
 
   return (
@@ -507,38 +563,105 @@ IMPORTANT: Before you begin building, please confirm:
                     )}
 
                     <div>
-                      <Label className="text-base font-medium text-muted-foreground mb-3 block">
-                        Key Learning Topics
-                      </Label>
-                      <div className="flex flex-wrap gap-2">
-                        {analysis.keyTopics.map((topic: string, index: number) => (
-                          <Badge key={index} variant="outline" className="text-sm px-3 py-1">{topic}</Badge>
+                      <div className="flex items-center justify-between mb-3">
+                        <Label className="text-base font-medium text-muted-foreground">
+                          Key Learning Topics
+                        </Label>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => addArrayItem(editableTopics, setEditableTopics)}
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Add Topic
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        {editableTopics.map((topic: string, index: number) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <Textarea
+                              value={topic}
+                              onChange={(e) => updateArrayItem(index, e.target.value, editableTopics, setEditableTopics)}
+                              className="min-h-[40px] resize-none text-sm"
+                              placeholder="Enter topic..."
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeArrayItem(index, editableTopics, setEditableTopics)}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
                         ))}
                       </div>
                     </div>
 
                     <div>
-                      <Label className="text-base font-medium text-muted-foreground mb-3 block">
-                        Learning Objectives
-                      </Label>
-                      <ul className="text-base space-y-2">
-                        {analysis.learningObjectives.map((objective: string, index: number) => (
-                          <li key={index} className="flex items-center gap-3">
-                            <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
-                            {objective}
-                          </li>
+                      <div className="flex items-center justify-between mb-3">
+                        <Label className="text-base font-medium text-muted-foreground">
+                          Learning Objectives
+                        </Label>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => addArrayItem(editableObjectives, setEditableObjectives)}
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Add Objective
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        {editableObjectives.map((objective: string, index: number) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <Textarea
+                              value={objective}
+                              onChange={(e) => updateArrayItem(index, e.target.value, editableObjectives, setEditableObjectives)}
+                              className="min-h-[40px] resize-none text-sm"
+                              placeholder="Enter learning objective..."
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeArrayItem(index, editableObjectives, setEditableObjectives)}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
+                          </div>
                         ))}
-                      </ul>
+                      </div>
                     </div>
 
                     <div>
-                      <Label className="text-base font-medium text-muted-foreground mb-3 block">
-                        Suggested Interactive Elements
-                      </Label>
-                      <div className="grid grid-cols-2 gap-3">
-                        {analysis.suggestedInteractions.map((interaction: string, index: number) => (
-                          <div key={index} className="text-base p-4 bg-muted rounded-lg">
-                            {interaction}
+                      <div className="flex items-center justify-between mb-3">
+                        <Label className="text-base font-medium text-muted-foreground">
+                          Suggested Interactive Elements
+                        </Label>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => addArrayItem(editableInteractions, setEditableInteractions)}
+                        >
+                          <Plus className="w-4 h-4 mr-1" />
+                          Add Element
+                        </Button>
+                      </div>
+                      <div className="space-y-2">
+                        {editableInteractions.map((interaction: string, index: number) => (
+                          <div key={index} className="flex items-center gap-2">
+                            <Textarea
+                              value={interaction}
+                              onChange={(e) => updateArrayItem(index, e.target.value, editableInteractions, setEditableInteractions)}
+                              className="min-h-[40px] resize-none text-sm"
+                              placeholder="Enter interactive element..."
+                            />
+                            <Button
+                              variant="ghost"
+                              size="sm"
+                              onClick={() => removeArrayItem(index, editableInteractions, setEditableInteractions)}
+                            >
+                              <Trash2 className="w-4 h-4 text-destructive" />
+                            </Button>
                           </div>
                         ))}
                       </div>
@@ -548,11 +671,28 @@ IMPORTANT: Before you begin building, please confirm:
                       <p className="text-base font-semibold text-primary mb-2">Value Proposition</p>
                       <p className="text-base leading-relaxed">{analysis.valueProposition}</p>
                     </div>
+
+                    {!showPrompt && (
+                      <div className="pt-4">
+                        <Button
+                          onClick={handleConfirmAnalysis}
+                          className="w-full h-12 text-base"
+                          size="lg"
+                        >
+                          <Check className="w-5 h-5 mr-2" />
+                          Confirm & Generate Claude Prompt
+                        </Button>
+                        <p className="text-sm text-center text-muted-foreground mt-3">
+                          Review and edit the suggestions above, then click to generate your final prompt
+                        </p>
+                      </div>
+                    )}
                   </CardContent>
                 </Card>
 
-                {/* Claude Code Prompt */}
-                <Card className="border-2 border-[#d4cdb8] shadow-[0_12px_40px_rgb(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgb(0,0,0,0.16)] transition-shadow duration-300 bg-white rounded-2xl">
+                {/* Claude Code Prompt - Only show after confirmation */}
+                {showPrompt && (
+                  <Card className="border-2 border-[#d4cdb8] shadow-[0_12px_40px_rgb(0,0,0,0.12)] hover:shadow-[0_16px_48px_rgb(0,0,0,0.16)] transition-shadow duration-300 bg-white rounded-2xl">
                   <CardHeader className="pb-6 pt-8 px-8">
                     <CardTitle className="flex items-center gap-3 text-2xl font-semibold">
                       <Copy className="w-6 h-6" />
@@ -590,6 +730,7 @@ IMPORTANT: Before you begin building, please confirm:
                     </Button>
                   </CardContent>
                 </Card>
+                )}
               </>
             )}
 
